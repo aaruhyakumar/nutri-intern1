@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { useAuth } from '../context/AuthContext';
-import AdminDashboard from '../pages/admin/AdminDashboard';
-import AdminInterns from '../pages/admin/AdminInterns';
-import AdminCases from '../pages/admin/AdminCases';
-import AdminGames from '../pages/admin/AdminGames';
-import AdminReviews from '../pages/admin/AdminReviews';
+
+const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
+const AdminInterns = lazy(() => import('../pages/admin/AdminInterns'));
+const AdminCases = lazy(() => import('../pages/admin/AdminCases'));
+const AdminGames = lazy(() => import('../pages/admin/AdminGames'));
+const AdminReviews = lazy(() => import('../pages/admin/AdminReviews'));
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard',      icon: '🏠', section: 'Overview' },
@@ -119,9 +120,11 @@ const AdminLayout = () => {
       </aside>
 
       <main className="main-content">
-        <PageTransition pageKey={active}>
-          {renderPage()}
-        </PageTransition>
+        <Suspense fallback={<div style={{padding: '2rem', textAlign: 'center'}}>Loading...</div>}>
+          <PageTransition pageKey={active}>
+            {renderPage()}
+          </PageTransition>
+        </Suspense>
       </main>
 
       {/* Mobile Bottom Tab Bar */}

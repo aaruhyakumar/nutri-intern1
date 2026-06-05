@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/Sidebar';
-import AdminLayout from './components/AdminLayout';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import Cases from './pages/Cases';
-import Games from './pages/Games';
-import Leaderboard from './pages/Leaderboard';
-import MyReviews from './pages/MyReviews';
-import Settings from './pages/Settings';
-import Progress from './pages/Progress';
+
+const AdminLayout = lazy(() => import('./components/AdminLayout'));
+const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Cases = lazy(() => import('./pages/Cases'));
+const Games = lazy(() => import('./pages/Games'));
+const Leaderboard = lazy(() => import('./pages/Leaderboard'));
+const MyReviews = lazy(() => import('./pages/MyReviews'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Progress = lazy(() => import('./pages/Progress'));
 import './index.css';
 
 const PageTransition = ({ children, pageKey }) => {
@@ -43,8 +44,8 @@ const AppContent = () => {
     return () => document.removeEventListener('navigate', handler);
   }, []);
 
-  if (!user) return <Login />;
-  if (isAdmin) return <AdminLayout />;
+  if (!user) return <Suspense fallback={<div className="loading-screen" />}><Login /></Suspense>;
+  if (isAdmin) return <Suspense fallback={<div className="loading-screen" />}><AdminLayout /></Suspense>;
 
   const renderSection = () => {
     switch (activeSection) {
@@ -94,10 +95,12 @@ const AppContent = () => {
       </header>
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} isOpen={isSidebarOpen} toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
       <main className="main-content">
-        {activeSection === 'games'
-          ? <Games />
-          : <PageTransition pageKey={activeSection}>{renderSection()}</PageTransition>
-        }
+        <Suspense fallback={<div style={{padding: '2rem', textAlign: 'center'}}>Loading...</div>}>
+          {activeSection === 'games'
+            ? <Games />
+            : <PageTransition pageKey={activeSection}>{renderSection()}</PageTransition>
+          }
+        </Suspense>
       </main>
     </div>
   );
