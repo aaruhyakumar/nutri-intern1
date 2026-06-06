@@ -1,19 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DiagnosticPearls from '../components/games/DiagnosticPearls';
 import QuickQuiz from '../components/games/QuickQuiz';
 import DecisionTrigger from '../components/games/DecisionTrigger';
 import ConceptPopup from '../components/games/ConceptPopup';
+import { PEARLS, TRIGGERS, QUIZ_QS, CONCEPTS } from '../data/cases';
+import { supabase } from '../supabaseClient';
 
-const GAMES = [
-  { id:'pearls',  title:'Diagnostic Pearls',  emoji:'💎', color:'var(--purple)', light:'var(--purple-light)', desc:'Flip cards to reveal clinical nutrition pearls. Test your knowledge of key diagnostic indicators.', pills:['Flashcard','8 pearls'],    stat:'8 cards' },
-  { id:'trigger', title:'Decision Trigger',   emoji:'🧠', color:'var(--teal)',   light:'var(--teal-light)',   desc:'If/Then clinical reasoning. Practice decision-making with real ward scenarios.', pills:['Scenario','Critical thinking'], stat:'3 scenarios' },
-  { id:'quiz',    title:'Quick Quiz',         emoji:'⚡', color:'var(--amber)',  light:'var(--amber-light)',  desc:'Rapid-fire timed questions on clinical dietetics. 10 questions, 15 seconds each.', pills:['Timed','10 questions'],       stat:'10 questions' },
-  { id:'concept', title:'Mini Concept Popup', emoji:'💡', color:'var(--coral)',  light:'var(--coral-light)',  desc:'Tap a concept to reveal explanations. Perfect for ward rounds prep.', pills:['Reference','Quick recall'],          stat:'6 concepts' },
+const INITIAL_GAMES = [
+  { id:'pearls',  title:'Diagnostic Pearls',  emoji:'💎', color:'var(--purple)', light:'var(--purple-light)', desc:'Flip cards to reveal clinical nutrition pearls. Test your knowledge of key diagnostic indicators.', pills:['Flashcard',`${PEARLS.length} pearls`],    stat:`${PEARLS.length} cards` },
+  { id:'trigger', title:'Decision Trigger',   emoji:'🧠', color:'var(--teal)',   light:'var(--teal-light)',   desc:'If/Then clinical reasoning. Practice decision-making with real ward scenarios.', pills:['Scenario','Critical thinking'], stat:`${TRIGGERS.length} scenarios` },
+  { id:'quiz',    title:'Quick Quiz',         emoji:'⚡', color:'var(--amber)',  light:'var(--amber-light)',  desc:`Rapid-fire timed questions on clinical dietetics. ${QUIZ_QS.length} questions, 15 seconds each.`, pills:['Timed',`${QUIZ_QS.length} questions`],       stat:`${QUIZ_QS.length} questions` },
+  { id:'concept', title:'Mini Concept Popup', emoji:'💡', color:'var(--coral)',  light:'var(--coral-light)',  desc:'Tap a concept to reveal explanations. Perfect for ward rounds prep.', pills:['Reference','Quick recall'],          stat:`${CONCEPTS.length} concepts` },
 ];
 
 const Games = () => {
   const [activeGame, setActiveGame] = useState(null);
-  const game = GAMES.find(g => g.id === activeGame);
+  const [gamesList, setGamesList] = useState(INITIAL_GAMES);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const [pearlsRes, triggersRes, quizRes, conceptsRes] = await Promise.all([
+          supabase.from('custom_pearls').select('*', { count: 'exact', head: true }),
+          supabase.from('custom_triggers').select('*', { count: 'exact', head: true }),
+          supabase.from('custom_quiz').select('*', { count: 'exact', head: true }),
+          supabase.from('custom_concepts').select('*', { count: 'exact', head: true })
+        ]);
+
+        const pearlCount = PEARLS.length + (pearlsRes.count || 0);
+        const triggerCount = TRIGGERS.length + (triggersRes.count || 0);
+        const quizCount = QUIZ_QS.length + (quizRes.count || 0);
+        const conceptCount = CONCEPTS.length + (conceptsRes.count || 0);
+
+        setGamesList([
+          { id:'pearls',  title:'Diagnostic Pearls',  emoji:'💎', color:'var(--purple)', light:'var(--purple-light)', desc:'Flip cards to reveal clinical nutrition pearls. Test your knowledge of key diagnostic indicators.', pills:['Flashcard',`${pearlCount} pearls`],    stat:`${pearlCount} cards` },
+          { id:'trigger', title:'Decision Trigger',   emoji:'🧠', color:'var(--teal)',   light:'var(--teal-light)',   desc:'If/Then clinical reasoning. Practice decision-making with real ward scenarios.', pills:['Scenario','Critical thinking'], stat:`${triggerCount} scenarios` },
+          { id:'quiz',    title:'Quick Quiz',         emoji:'⚡', color:'var(--amber)',  light:'var(--amber-light)',  desc:`Rapid-fire timed questions on clinical dietetics. ${quizCount} questions, 15 seconds each.`, pills:['Timed',`${quizCount} questions`],       stat:`${quizCount} questions` },
+          { id:'concept', title:'Mini Concept Popup', emoji:'💡', color:'var(--coral)',  light:'var(--coral-light)',  desc:'Tap a concept to reveal explanations. Perfect for ward rounds prep.', pills:['Reference','Quick recall'],          stat:`${conceptCount} concepts` },
+        ]);
+      } catch (err) {
+        console.error('Error fetching game counts:', err);
+      }
+    };
+    
+    fetchCounts();
+  }, []);
+
+  const game = gamesList.find(g => g.id === activeGame);
 
   if (activeGame) {
     return (
@@ -51,7 +84,7 @@ const Games = () => {
       </div>
 
       <div className="games-grid">
-        {GAMES.map(g => (
+        {gamesList.map(g => (
           <div key={g.id} style={{background:'white',borderRadius:'20px',overflow:'hidden',boxShadow:'var(--shadow)',transition:'transform 0.2s,box-shadow 0.2s',cursor:'pointer'}}
             onMouseEnter={e => { e.currentTarget.style.transform='translateY(-4px)'; e.currentTarget.style.boxShadow='var(--shadow-hover)'; }}
             onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='var(--shadow)'; }}>

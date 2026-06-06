@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getAdminOverview, getCustomCases, getCustomQuiz } from '../../supabaseClient';
+
+const getTimeAgo = (t) => {
+  if (!t) return '—';
+  const diff = (Date.now() - new Date(t)) / 1000;
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  return Math.floor(diff / 86400) + 'd ago';
+};
 
 const AdminDashboard = () => {
   const [interns, setInterns] = useState([]);
@@ -17,14 +25,6 @@ const AdminDashboard = () => {
   const totalGames = interns.reduce((s, i) => s + (i.games_played || 0), 0);
   const avgQuiz    = interns.length ? Math.round(interns.reduce((s,i) => s+(i.avg_quiz_score||0),0) / interns.length) : 0;
   const maxXP      = interns.length ? Math.max(...interns.map(i => i.xp||0)) : 1;
-
-  const getTimeAgo = (t) => {
-    if (!t) return '—';
-    const diff = (Date.now() - new Date(t)) / 1000;
-    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-    return Math.floor(diff / 86400) + 'd ago';
-  };
 
   const STAT_CARDS = [
     { label: 'Total Interns',    value: interns.length, icon: '👥', grad: 'linear-gradient(135deg,#1D9E75,#0a5c47)', sub: 'Registered' },

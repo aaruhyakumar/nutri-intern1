@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { saveCustomQuizQuestion, getCustomQuiz, deleteCustomQuizQuestion, deleteCustomPearl, deleteCustomTrigger, deleteCustomConcept } from '../../supabaseClient';
 import { supabase } from '../../supabaseClient';
 

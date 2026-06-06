@@ -7,6 +7,14 @@ import {
 
 const TABS = ['📊 Intern Records', '📋 Upload Cases', '🎮 Game Data', '✍️ Reviews'];
 
+const getTimeAgo = (t) => {
+  if (!t) return '—';
+  const diff = (Date.now() - new Date(t)) / 1000;
+  if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+  return Math.floor(diff / 86400) + 'd ago';
+};
+
 const Admin = () => {
   const { user, isAdmin } = useAuth();
   const [tab, setTab] = useState(0);
@@ -79,14 +87,6 @@ const Admin = () => {
       getCustomQuiz().then(setCustomQuiz);
     } else { setQuizMsg('❌ Failed.'); }
     setTimeout(() => setQuizMsg(''), 3000);
-  };
-
-  const getTimeAgo = (t) => {
-    if (!t) return '—';
-    const diff = (Date.now() - new Date(t)) / 1000;
-    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-    return Math.floor(diff / 86400) + 'd ago';
   };
 
   if (!isAdmin) return (

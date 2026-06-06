@@ -2,6 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getAdminReviews, supabase } from '../supabaseClient';
 
+const getTimeAgo = (t) => {
+  const d = (Date.now() - new Date(t)) / 1000;
+  if (d < 3600) return Math.floor(d / 60) + 'm ago';
+  if (d < 86400) return Math.floor(d / 3600) + 'h ago';
+  return Math.floor(d / 86400) + 'd ago';
+};
+
 const MyReviews = () => {
   const { user, profile } = useAuth();
   const [reviews, setReviews] = useState([]);
@@ -27,13 +34,6 @@ const MyReviews = () => {
 
     return () => subscription.unsubscribe();
   }, [user]);
-
-  const getTimeAgo = (t) => {
-    const d = (Date.now() - new Date(t)) / 1000;
-    if (d < 3600) return Math.floor(d / 60) + 'm ago';
-    if (d < 86400) return Math.floor(d / 3600) + 'h ago';
-    return Math.floor(d / 86400) + 'd ago';
-  };
 
   const avgRating = reviews.length
     ? (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length).toFixed(1)

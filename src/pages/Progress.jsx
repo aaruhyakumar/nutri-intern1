@@ -6,6 +6,13 @@ const GAME_NAMES = { pearls:'Diagnostic Pearls', quiz:'Quick Quiz', trigger:'Dec
 const GAME_COLORS = { pearls:'var(--purple)', quiz:'var(--amber)', trigger:'var(--teal)', concept:'var(--coral)' };
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+const getTimeAgo = (t) => {
+  const d = (Date.now()-new Date(t))/1000;
+  if (d<3600) return Math.floor(d/60)+'m ago';
+  if (d<86400) return Math.floor(d/3600)+'h ago';
+  return Math.floor(d/86400)+'d ago';
+};
+
 const Progress = () => {
   const { user, profile } = useAuth();
   const [stats, setStats] = useState({ cases:0, games:0, le:0, xp:0, quizScore:0 });
@@ -66,13 +73,6 @@ const Progress = () => {
   const xpToNext = level * 100;
   const xpPct = Math.min(Math.round((stats.xp % xpToNext) / xpToNext * 100), 100);
   const maxActivity = Math.max(...weekActivity, 1);
-
-  const getTimeAgo = (t) => {
-    const d = (Date.now()-new Date(t))/1000;
-    if (d<3600) return Math.floor(d/60)+'m ago';
-    if (d<86400) return Math.floor(d/3600)+'h ago';
-    return Math.floor(d/86400)+'d ago';
-  };
 
   // Day labels starting from 7 days ago
   const dayLabels = Array(7).fill(0).map((_, i) => {

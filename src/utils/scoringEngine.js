@@ -105,8 +105,8 @@ const matchKeyword = (lowerAnswer, keyword, semanticVariations) => {
   }
 
   // Partial word match (word boundaries)
-  const words = lowerAnswer.split(/[\s,.\-;:\/]+/);
-  const keywordWords = lowerKeyword.split(/[\s,.\-;:\/]+/);
+  const words = lowerAnswer.split(/[\s,.-;:/-]+/);
+  const keywordWords = lowerKeyword.split(/[\s,.-;:/-]+/);
 
   // If keyword is multiple words, all must be present
   if (keywordWords.length > 1) {

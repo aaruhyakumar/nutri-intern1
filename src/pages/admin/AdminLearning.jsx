@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
 
 const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'];
@@ -18,6 +18,7 @@ const AdminLearning = () => {
     setCases(data || []);
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadCases(); }, []);
 
   const updateHint = (i, val) => {

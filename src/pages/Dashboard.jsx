@@ -2,6 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getProgress, getGameScores, getCaseAttempts, getLESessions } from '../supabaseClient';
 
+const getTimeAgo = (t) => {
+  if (!t) return '—';
+  const d = (Date.now()-new Date(t))/1000;
+  if (d<3600) return Math.floor(d/60)+'m ago';
+  if (d<86400) return Math.floor(d/3600)+'h ago';
+  return Math.floor(d/86400)+'d ago';
+};
+
 const Dashboard = () => {
   const { profile, user } = useAuth();
   const [stats, setStats] = useState({ cases: 0, quizScore: 0, gamesPlayed: 0, xp: 0 });
@@ -33,13 +41,6 @@ const Dashboard = () => {
     };
     load();
   }, [user]);
-
-  const getTimeAgo = (t) => {
-    const d = (Date.now()-new Date(t))/1000;
-    if (d<3600) return Math.floor(d/60)+'m ago';
-    if (d<86400) return Math.floor(d/3600)+'h ago';
-    return Math.floor(d/86400)+'d ago';
-  };
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
